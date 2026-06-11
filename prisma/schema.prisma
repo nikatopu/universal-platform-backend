@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+enum BookingStatus {
+  BOOKED
+  CANCELLED
+}
+
+enum MembershipStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum GymStatus {
+  OPEN
+  CLOSED
+  HOLIDAY
+  RENOVATION
+}
+
+enum CompanyStatus {
+  ACTIVE
+  INACTIVE
+}
+
+// ─── Models ───────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password_hash String
+  first_name    String
+  last_name     String
+  role          Role      @default(MEMBER)
+  refresh_token String?
+  deleted_at    DateTime?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  bookings         Booking[]
+  user_memberships UserMembership[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model Company {
+  id         String        @id @default(uuid())
+  project_id String
+  name       String
+  email      String?
+  phone      String?
+  status     CompanyStatus @default(ACTIVE)
+  created_at DateTime      @default(now())
+  updated_at DateTime      @updatedAt
+
+  professionals Professional[]
+  programs      Program[]
+  memberships   Membership[]
+  classes       Class[]
+  settings      Settings?
+
+  @@index([project_id])
+  @@map("companies")
+}
+
+model Professional {
+  id             String    @id @default(uuid())
+  company_id     String
+  first_name     String
+  last_name      String
+  specialization String?
+  bio            String?
+  image_url      String?
+  active         Boolean   @default(true)
+  deleted_at     DateTime?
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+
+  company Company @relation(fields: [company_id], references: [id])
+  classes Class[]
+
+  @@index([company_id])
+  @@map("professionals")
+}
+
+model Program {
+  id               String    @id @default(uuid())
+  company_id       String
+  title            String
+  description      String?
+  category         String?
+  duration_minutes Int
+  deleted_at       DateTime?
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+
+  company Company @relation(fields: [company_id], references: [id])
+  classes Class[]
+
+  @@index([company_id])
+  @@map("programs")
+}
+
+model Membership {
+  id          String    @id @default(uuid())
+  company_id  String
+  title       String
+  description String?
+  price       Float
+  deleted_at  DateTime?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+
+  company          Company          @relation(fields: [company_id], references: [id])
+  user_memberships UserMembership[]
+
+  @@index([company_id])
+  @@map("memberships")
+}
+
+model Class {
+  id              String    @id @default(uuid())
+  company_id      String
+  professional_id String
+  program_id      String
+  title           String
+  date            DateTime  @db.Date
+  start_time      String
+  end_time        String
+  max_seats       Int
+  deleted_at      DateTime?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  company      Company      @relation(fields: [company_id], references: [id])
+  professional Professional @relation(fields: [professional_id], references: [id])
+  program      Program      @relation(fields: [program_id], references: [id])
+  bookings     Booking[]
+
+  @@index([company_id])
+  @@index([date])
+  @@map("classes")
+}
+
+model Booking {
+  id         String        @id @default(uuid())
+  user_id    String
+  class_id   String
+  status     BookingStatus @default(BOOKED)
+  created_at DateTime      @default(now())
+
+  user  User  @relation(fields: [user_id], references: [id])
+  class Class @relation(fields: [class_id], references: [id])
+
+  @@unique([user_id, class_id])
+  @@index([user_id])
+  @@index([class_id])
+  @@map("bookings")
+}
+
+model UserMembership {
+  id            String           @id @default(uuid())
+  user_id       String
+  membership_id String
+  start_date    DateTime         @db.Date
+  end_date      DateTime         @db.Date
+  status        MembershipStatus @default(ACTIVE)
+
+  user       User       @relation(fields: [user_id], references: [id])
+  membership Membership @relation(fields: [membership_id], references: [id])
+
+  @@index([user_id])
+  @@map("user_memberships")
+}
+
+model Settings {
+  id           String    @id @default(uuid())
+  company_id   String    @unique
+  gym_status   GymStatus @default(OPEN)
+  announcement String?
+
+  company Company @relation(fields: [company_id], references: [id])
+
+  @@map("settings")
+}
