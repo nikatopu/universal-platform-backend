@@ -10,7 +10,7 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "npx nest start",
     "start:dev": "npx nest start --watch",
-    "start:prod": "node dist/main.js",
+    "start:prod": "node start.js",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
