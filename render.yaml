@@ -3,8 +3,8 @@ services:
     name: universal-platform-backend
     runtime: node
     rootDir: .
-    buildCommand: npm ci && npm run build && pwd && ls -la && ls -la dist
-    startCommand: pwd && ls -la dist && npm run start:prod
+    buildCommand: npm ci
+    startCommand: npm run build && node dist/main.js
     envVars:
       - key: NODE_ENV
         value: production
