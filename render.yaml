@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: universal-platform-backend
+    runtime: node
+    buildCommand: npm ci && npm run build && ls -la dist
+    startCommand: npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
