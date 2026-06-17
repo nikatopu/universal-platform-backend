@@ -8,8 +8,10 @@ const fs = require('fs');
 const possiblePaths = [
   path.join(__dirname, 'dist', 'main.js'),
   path.join(__dirname, '..', 'dist', 'main.js'),
+  path.join(__dirname, '..', '..', 'dist', 'main.js'),
   path.join(process.cwd(), 'dist', 'main.js'),
   path.join(process.cwd(), '..', 'dist', 'main.js'),
+  '/opt/render/project/dist/main.js', // Render-specific absolute path
 ];
 
 let mainPath = null;
