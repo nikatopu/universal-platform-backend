@@ -20,6 +20,7 @@ async function bootstrap() {
     origin: allowedOrigins,
     credentials: true,
   });
+  console.log(`CORS allowed origins: ${allowedOrigins}`);
 
   app.setGlobalPrefix("api/v1");
 
