@@ -13,8 +13,9 @@ async function bootstrap() {
 
   app.use(helmet());
 
+  const allowedOrigins = config.get<string>("FRONTEND_URL", "*").split(",");
   app.enableCors({
-    origin: config.get<string>("FRONTEND_URL", "*"),
+    origin: allowedOrigins,
     credentials: true,
   });
 
@@ -34,7 +35,7 @@ async function bootstrap() {
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle("Universal Booking System API")
-    .setDescription("Fitness Studio Booking Platform — REST API")
+    .setDescription("API documentation for the Universal Booking System")
     .setVersion("1.0")
     .addBearerAuth(
       {
@@ -53,8 +54,8 @@ async function bootstrap() {
   const port = config.get<number>("PORT", 3000);
   await app.listen(port);
 
-  console.log(`Server running on: http://localhost:${port}/api/v1`);
-  console.log(`Swagger docs:      http://localhost:${port}/api/docs`);
+  console.log(`Server running on: /api/v1`);
+  console.log(`Swagger docs:      /api/docs`);
 }
 
 bootstrap();
