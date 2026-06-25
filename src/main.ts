@@ -56,6 +56,12 @@ async function bootstrap() {
 
   console.log(`Server running on: /api/v1`);
   console.log(`Swagger docs:      /api/docs`);
+
+  // Log every request to the console
+  app.use((req, res, next) => {
+    console.log(`${req.method} ${req.originalUrl}`);
+    next();
+  });
 }
 
 bootstrap();
