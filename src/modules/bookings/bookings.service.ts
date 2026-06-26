@@ -47,9 +47,55 @@ export class BookingsService {
 
     const hasConflict = myBookings.some((booking) => {
       const bookedClass = booking.class;
+
+      // start time and end time are in format HH:MM, so we need to convert them to Date objects for comparison
+      const [bookedStartHour, bookedStartMinute] = bookedClass.start_time
+        .split(":")
+        .map(Number);
+      const [bookedEndHour, bookedEndMinute] = bookedClass.end_time
+        .split(":")
+        .map(Number);
+      const [clsStartHour, clsStartMinute] = cls.start_time
+        .split(":")
+        .map(Number);
+      const [clsEndHour, clsEndMinute] = cls.end_time.split(":").map(Number);
+
+      // Now compare the times
+      // bookedStartHour < clsEndHour || (bookedStartHour === clsEndHour && bookedStartMinute < clsEndMinute)
+      // bookedEndHour > clsStartHour || (bookedEndHour === clsStartHour && bookedEndMinute > clsStartMinute)
+      const bookedStartTime = new Date(
+        bookedClass.date.getFullYear(),
+        bookedClass.date.getMonth(),
+        bookedClass.date.getDate(),
+        bookedStartHour,
+        bookedStartMinute,
+      );
+      const bookedEndTime = new Date(
+        bookedClass.date.getFullYear(),
+        bookedClass.date.getMonth(),
+        bookedClass.date.getDate(),
+        bookedEndHour,
+        bookedEndMinute,
+      );
+      const clsStartTime = new Date(
+        cls.date.getFullYear(),
+        cls.date.getMonth(),
+        cls.date.getDate(),
+        clsStartHour,
+        clsStartMinute,
+      );
+      const clsEndTime = new Date(
+        cls.date.getFullYear(),
+        cls.date.getMonth(),
+        cls.date.getDate(),
+        clsEndHour,
+        clsEndMinute,
+      );
+
       return (
         bookedClass.date.getTime() === cls.date.getTime() &&
-        bookedClass.start_time === cls.start_time
+        bookedStartTime < clsEndTime &&
+        bookedEndTime > clsStartTime
       );
     });
 
